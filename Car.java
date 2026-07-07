@@ -1,3 +1,11 @@
+/**
+ * Joseph Nunez
+ * CEN 3024C - Software Development 1
+ * June 5, 2026
+ * Car.java
+ * This class defines the attributes that
+ * will be used to identify cars
+ */
 public class Car {
 
     private String Make, Model, Country;
