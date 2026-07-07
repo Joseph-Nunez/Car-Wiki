@@ -3,6 +3,14 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Joseph Nunez
+ * CEN 3024C - Software Development 1
+ * July 5, 2026
+ * CarDatabase.java
+ * This class keeps a list of cars to be able
+ * to test the functionality and logic of car wiki
+ */
 public class CarDatabase {
     //Local database for testing avoiding SQLite
     private Car[] cars = {
