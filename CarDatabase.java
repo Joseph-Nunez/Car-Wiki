@@ -1,3 +1,6 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -277,6 +280,78 @@ public class CarDatabase {
         List<Car> list = getAllCars();
         list.sort(Comparator.comparingDouble(Car::getHorsepower).reversed());
         return list;
+    }
+    // Checks if a car with the same make and model already exists (case-insensitive)
+    public boolean carExists(String make, String model) {
+        for (Car car : cars) {
+            if (car.getMake().equalsIgnoreCase(make) && car.getModel().equalsIgnoreCase(model)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void addCar(Car car) {
+        Car[] newCars = Arrays.copyOf(cars, cars.length + 1);
+        newCars[cars.length] = car;
+        cars = newCars;
+    }
+
+    public boolean removeCar(Car car) {
+        int index = -1;
+        for (int i = 0; i < cars.length; i++) {
+            if (cars[i] == car) { // reference match, since Car doesn't override equals()
+                index = i;
+                break;
+            }
+        }
+        if (index == -1) return false;
+
+        Car[] newCars = new Car[cars.length - 1];
+        int j = 0;
+        for (int i = 0; i < cars.length; i++) {
+            if (i != index) {
+                newCars[j++] = cars[i];
+            }
+        }
+        cars = newCars;
+        return true;
+    }
+
+    public int loadFromFile(String path) throws IOException {
+        List<Car> newCars = new ArrayList<>(); // collected here, then merged into the array once at the end
+        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty()) continue;
+                String[] parts = line.split(",");
+                if (parts.length != 5) continue; // skip misformatted lines instead of crashing
+                try {
+                    String make = parts[0].trim();
+                    String model = parts[1].trim();
+                    String country = parts[2].trim();
+                    int topSpeed = Integer.parseInt(parts[3].trim());
+                    int horsepower = Integer.parseInt(parts[4].trim());
+                    Car car = new Car(make, model, country, topSpeed, horsepower);
+                    if (car.validate()) {
+                        newCars.add(car);
+                    }
+                } catch (NumberFormatException e) {
+                    // skip misformatted line rather than crashing the whole load
+                }
+            }
+        }
+
+        if (!newCars.isEmpty()) {
+            Car[] combined = Arrays.copyOf(cars, cars.length + newCars.size());
+            for (int i = 0; i < newCars.size(); i++) {
+                combined[cars.length + i] = newCars.get(i); // adds to database
+            }
+            cars = combined;
+        }
+
+        return newCars.size();
     }
 }
 
